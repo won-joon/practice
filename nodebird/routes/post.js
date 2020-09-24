@@ -1,5 +1,5 @@
 const express = require('express');
-const { Post } = require('../models');
+const { Post, Hashtag } = require('../models');
 
 const router = express.Router();
 
@@ -11,8 +11,12 @@ router.post('/', async (req, res, next) => {
         });
         const hashtags = req.body.content.match(/#[^\s]*/g);
         if(hashtags){
-            await Promise.all(hashtags.map(tag))
+            const result = await Promise.all(hashtags.map(tag => Hashtag.findOrCreate({
+                where: { title: tag.slice(1).toLowerCase() },
+            })));
+            await post.addHashtags(result.map(r => r[0]));
         }
+        res.redirect('/');
     }catch(error){
         console.error(error);
         next(error);
