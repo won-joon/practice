@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
+const { Post, User} = require('../models');
 
 //프로필 페이지
 router.get('/profile', isLoggedIn, (req, res) => {
@@ -16,12 +17,24 @@ router.get('/join', isNotLoggedIn, (req, res) => {
 });
 //메인 페이지
 router.get('/', (req, res, next) => {
-    res.render('main', {
-        title: 'NodeBird',
-        twits: [],
-        user: req.user,
-        loginError: req.flash('loginError'),
-    });
+    Post.findAll({
+        include: {
+            model: User,
+            attributes: ['id', 'nick'],
+        },
+    })
+        .then((posts) => {
+            res.render('main', {
+                title: 'NodeBird',
+                twits: posts,
+                user: req.user,
+                loginError: req.flash('loginError'),
+            });
+        })
+        .catch((error) => {
+            console.error(error);
+            next(error);
+        });
 });
 
 

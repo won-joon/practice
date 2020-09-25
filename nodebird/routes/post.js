@@ -1,5 +1,5 @@
 const express = require('express');
-const { Post, Hashtag } = require('../models');
+const { Post, Hashtag, User } = require('../models');
 
 const router = express.Router();
 
@@ -23,4 +23,25 @@ router.post('/', async (req, res, next) => {
     }
 });
 
+router.get('/hashtag', async (req, res, next) => {
+    const query = req.query.hashtag;
+    if(!query){
+        return res.redirect('/');
+    }
+    try{
+        const hashtag = await Hashtag.findOne({ where: { title: query }});
+        let posts = [];
+        if(hashtag){
+            posts = await hashtag.getPosts({ include: [{ model: User }]});
+        }
+        return res.render('main', {
+            title: `${query} | NodeBird`,
+            user: req.user,
+            twits: posts,
+        });
+    }catch(error){
+        console.error(error);
+        next(error);
+    }
+})
 module.exports = router;
