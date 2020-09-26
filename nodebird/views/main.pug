@@ -24,17 +24,16 @@ block content
           else if user &&  user.id !== twit.user.id && follow
             button.twit-unfollow 팔로우끊기
           .twit-content= twit.content
+          -const like = user && twit && twit.Liker.map(l => l.id).includes(user.id);
+          if user && !like
+            button.like 좋아요
+          else if user && like
+            button.unlike 좋아요 취소
+          if user && user.id === twit.user.id
+            button.delete 게시글 삭제
           if twit.img
             .twit-img
               img(src=twit.img alt='섬네일  ')
-          //
-            -const like = user && twit && twit.Liker.map(l => l.id).includes(user.id);
-            if user && !like
-              button.like 좋아요
-            else if user && like
-              button.unlike 좋아요 취소
-            if user && user.id === twit.user.id
-              button.delete 게시글 삭제
   script.
     [].forEach.call(document.querySelectorAll('.twit-follow'), function (tag) {
       tag.addEventListener('click', function () {

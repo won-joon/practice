@@ -43,5 +43,38 @@ router.get('/hashtag', async (req, res, next) => {
         console.error(error);
         next(error);
     }
-})
+});
+
+router.post('/:id/like', async(req, res, next) =>{
+    try{
+        const post = await Post.findOne({ where: { id: req.user.id }});
+        await post.addLiker(req.params.id);
+        res.send('Ok');
+    }catch(error){
+        console.error(error);
+        next(error);
+    }
+});
+
+router.delete('/:id/like', async(req, res, next) => {
+    try{
+        const post = await Post.findOne({ where: { id: req.user.id }});
+        await post.removeLiker(req.params.id);
+        res.send('Ok');
+    }catch(error){
+        console.error(error);
+        next(error);
+    }
+});
+
+router.delete('/:id', async(req, res, next) => {
+    try{
+        await Post.destroy({ where: { id: req.params.id, userId: req.user.id }});
+        res.send('OK');
+    }catch(error){
+        console.error(error);
+        next(error);
+    }
+});
+
 module.exports = router;
